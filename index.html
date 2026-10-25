@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Immersion Bingo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Spectral:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #0b141c;
+            --panel: #11212e;
+            --border: #1f3545;
+            --brass: #c9a24b;
+            --brass-dim: #7a6636;
+            --teal: #2bd9c9;
+            --teal-dim: #1d8c81;
+            --text: #dce6ec;
+            --text-dim: #8fa3b0;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-padding-top: env(safe-area-inset-top, 0px);
+        }
+
+        body {
+            margin: 0;
+            min-height: 100%;
+            background:
+                radial-gradient(ellipse at top, rgba(43, 217, 201, 0.06), transparent 60%),
+                var(--bg);
+            color: var(--text);
+            font-family: 'Spectral', serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 48px 16px 64px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: clamp(28px, 5vw, 44px);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin: 0 0 6px;
+            background: linear-gradient(180deg, var(--brass) 0%, var(--brass-dim) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+        }
+
+        .share-btn {
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--brass);
+            background: rgba(201, 162, 75, 0.08);
+            border: 1px solid var(--brass-dim);
+            padding: 10px 24px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+
+        .share-btn:hover {
+            background: rgba(43, 217, 201, 0.1);
+            color: var(--teal);
+            border-color: var(--teal-dim);
+            box-shadow: 0 0 10px rgba(43, 217, 201, 0.25);
+        }
+
+        .share-btn:active {
+            transform: translateY(1px);
+        }
+
+        .share-status {
+            font-family: 'Spectral', serif;
+            font-size: 12px;
+            letter-spacing: 0.06em;
+            color: var(--teal);
+            height: 16px;
+            margin-bottom: 6px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .share-status.show {
+            opacity: 1;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--brass-dim);
+            margin-bottom: 32px;
+            width: min(420px, 80vw);
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--brass-dim), transparent);
+        }
+
+        .divider span {
+            display: block;
+            width: 7px;
+            height: 7px;
+            background: var(--brass);
+            transform: rotate(45deg);
+            box-shadow: 0 0 6px rgba(201, 162, 75, 0.6);
+        }
+
+        .frame {
+            position: relative;
+            padding: 28px;
+            background: linear-gradient(160deg, var(--panel), #0d1922);
+            border: 1px solid var(--border);
+            box-shadow:
+                0 0 0 1px rgba(43, 217, 201, 0.04),
+                0 20px 60px rgba(0, 0, 0, 0.5);
+            width: min(900px, 94vw);
+            box-sizing: border-box;
+        }
+
+        .corner {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--teal-dim);
+        }
+
+        .corner.tl {
+            top: -1px;
+            left: -1px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner.tr {
+            top: -1px;
+            right: -1px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .corner.bl {
+            bottom: -1px;
+            left: -1px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .corner.br {
+            bottom: -1px;
+            right: -1px;
+            border-left: none;
+            border-top: none;
+        }
+
+        table {
+            border-collapse: collapse;
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        td {
+            width: 20%;
+            height: clamp(80px, 21vw, 212px);
+            border: 1px solid var(--border);
+            padding: clamp(6px, 2.2vw, 16px);
+            text-align: center;
+            vertical-align: middle;
+            font-size: clamp(11px, 2.4vw, 17px);
+            line-height: 1.25;
+            color: var(--text-dim);
+            background: rgba(255, 255, 255, 0.01);
+            cursor: pointer;
+            transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        td:hover {
+            background: rgba(43, 217, 201, 0.06);
+            color: var(--text);
+        }
+
+        td.checked {
+            background: linear-gradient(160deg, rgba(43, 217, 201, 0.22), rgba(43, 217, 201, 0.08));
+            color: #eafffb;
+            box-shadow: inset 0 0 0 1px var(--teal-dim), 0 0 14px rgba(43, 217, 201, 0.25);
+        }
+
+        td.free {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-size: 15px;
+            color: var(--brass);
+            background: rgba(201, 162, 75, 0.08);
+            box-shadow: inset 0 0 0 1px var(--brass-dim);
+            cursor: default;
+        }
+
+        td.free:hover {
+            background: rgba(201, 162, 75, 0.08);
+            color: var(--brass);
+        }
+
+        .score {
+            margin-top: 28px;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.1em;
+            font-size: 16px;
+            color: var(--brass);
+            text-transform: uppercase;
+        }
+
+        .score span {
+            color: var(--teal);
+        }
+
+        @media (max-width: 640px) {
+            .frame {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Immersion Bingo</h1>
+    <button class="share-btn" onclick="shareBingo()">Share Your Bingo</button>
+    <div class="share-status" id="share-status"></div>
+    <div class="divider"><span></span></div>
+
+    <div class="frame">
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+        <table id="board"></table>
+    </div>
+
+    <div class="score">Immersion Score: <span id="score-val">0</span>/25</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        var score = 0;
+
+        var cards = [
+            '"Stop the ship i have wp"',
+            "Apophis spawns",
+            "Mythical spawns",
+            "Someone falls off the ship",
+            "Someone dies before i4",
+            "Sinter joins the vc to troll",
+            "Blacklisted person joins the vc to troll",
+            "Dragon despawns or gets flung",
+            "Dragon falls off the cliff",
+            "Dragon gets shredded in under a minute",
+            "Someone uses elementals",
+            "Someone flares the pillar",
+            "Someone aggroes before the go signal",
+            '"Can I have soap"',
+            "Teal dragon",
+            "Potion effects get cleared",
+            "Armor break from parrying a pounce",
+            "Someone makes a mommy apophis joke",
+            "Immersionado spawns on the ship",
+            "Icebergs spawn in the way",
+            "Jorund spawns at departure",
+            "Jorund attacks the ship",
+            "Omen spawns",
+            "Dragon movestacks",
+            "First move apotheosis",
+            "Dragon starts movestacking before the fight starts",
+            "Atlantean brig",
+            "Volcano island",
+            "Megaforest",
+            "Someone drowns",
+            "Black dragon",
+            "Someone blocks the ship at departure",
+            "Someone forgets to unequip insanity gear",
+            "20x Blasts/Dragon's fury",
+            "Pulsar/annihilation",
+            "Flight gets interrupted by wp",
+            "Someone dies to an immersionado",
+            "Someone dies to fall damage",
+            "Someone takes 2 minutes to climb",
+            "Someone gets downed in an asscrack",
+            "Instakill cannon bug strikes again",
+            "Someone forgets to feed their fleet",
+            "Someone dies to water poisoning",
+            "Someone falls off of mast",
+            "10+ player party",
+            "Hunt gets ganked",
+            "Vetex gif sent in vc chat",
+            "Hitler (poison lightning)",
+            "Blocked pillar",
+            "Someone uses the bath instead of soap",
+            "The ship gets bugged",
+            '"What dragon is it?" right after someone says what dragon it is',
+            "Someone fails to get on the ship and sinks to the bottom of the sea",
+            "Stone scaled/crystal scaled spawns",
+            "Diamond dragon",
+            "Vyrdrasil gets mistaken for a blood seeping",
+            "Someone asks for an invite to the party while they already have one",
+            '"Where do we meet?"',
+            '"Have you departed yet?"',
+            '"Can I have a mast spot?"',
+            "Invisible immersionado",
+            "Someone on mast forgets to equip soap",
+            "Dragon gives up",
+            "Someone doesn't clear notoriety"
+        ];
+
+        function shuffle(array) {
+            let currentIndex = array.length;
+            while (currentIndex != 0) {
+                let randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+        }
+
+        function check(td) {
+            if (td.classList.contains("checked")) {
+                td.classList.remove("checked");
+                score -= 1;
+            } else {
+                td.classList.add("checked");
+                score += 1;
+            }
+            document.getElementById("score-val").textContent = score;
+        }
+
+        function shareBingo() {
+            var status = document.getElementById("share-status");
+            var btn = document.querySelector(".share-btn");
+            btn.disabled = true;
+            btn.textContent = "Capturing...";
+            html2canvas(document.querySelector(".frame"), { backgroundColor: "#0b141c", scale: 2 }).then(function (canvas) {
+                canvas.toBlob(function (blob) {
+                    if (navigator.clipboard && window.ClipboardItem) {
+                        navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]).then(function () {
+                            showStatus(status, "Copied to clipboard!");
+                        }).catch(function () {
+                            fallbackDownload(canvas, status);
+                        });
+                    } else {
+                        fallbackDownload(canvas, status);
+                    }
+                    btn.disabled = false;
+                    btn.textContent = "Share Your Bingo";
+                });
+            }).catch(function () {
+                showStatus(status, "Couldn't capture image");
+                btn.disabled = false;
+                btn.textContent = "Share Your Bingo";
+            });
+        }
+
+        function fallbackDownload(canvas, status) {
+            var link = document.createElement("a");
+            link.download = "immersion-bingo.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+            showStatus(status, "Clipboard unavailable — downloaded instead");
+        }
+
+        function showStatus(status, msg) {
+            status.textContent = msg;
+            status.classList.add("show");
+            clearTimeout(status._t);
+            status._t = setTimeout(function () { status.classList.remove("show"); }, 2800);
+        }
+
+        function bingo() {
+            shuffle(cards);
+            var table = document.getElementById("board");
+            var counter = 1;
+            for (var i = 1; i <= 25; i++) {
+                if (i == 1 || i == 6 || i == 11 || i == 16 || i == 21) {
+                    counter = i;
+                    let tr = document.createElement("tr");
+                    tr.id = "row-" + counter;
+                    table.appendChild(tr);
+                }
+                let td = document.createElement("td");
+                td.setAttribute("onclick", "check(this)");
+                td.innerHTML = cards[i];
+                document.getElementById("row-" + counter).appendChild(td);
+            }
+        }
+
+        window.onload = bingo;
+    </script>
+</body>
+
+</html>
